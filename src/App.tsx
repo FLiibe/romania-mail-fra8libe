@@ -137,9 +137,9 @@ export default function App() {
           </div>
           <a 
             id="977c361c-28d3-013d-3b65-f4c59a4a9495"
-            href="#oferta" 
+            href="https://pay.hotmart.com/S106869641Q?checkoutMode=10" 
             className="cta-btn"
-            onClick={(e) => handleNavigation(e, "#oferta")}
+            onClick={(e) => handleNavigation(e, "https://pay.hotmart.com/S106869641Q?checkoutMode=10")}
           >
             Vreau Ritualurile de Protecție →
           </a>
