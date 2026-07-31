@@ -18,6 +18,9 @@ import {
   Lock, 
   CheckCircle 
 } from "lucide-react";
+import UpsellPage from "./components/UpsellPage";
+import DownsellPage from "./components/DownsellPage";
+import ThankYouPage from "./components/ThankYouPage";
 
 const notificationsData = [
   { name: "Mariana S.", city: "București", time: "acum 2 minute" },
@@ -35,6 +38,23 @@ const notificationsData = [
 export default function App() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [currentNotification, setCurrentNotification] = useState<number | null>(null);
+  const [path, setPath] = useState(window.location.pathname);
+  const [purchasedUpsell, setPurchasedUpsell] = useState(false);
+  const [purchasedDownsell, setPurchasedDownsell] = useState(false);
+
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setPath(window.location.pathname);
+    };
+    window.addEventListener("popstate", handleLocationChange);
+    return () => window.removeEventListener("popstate", handleLocationChange);
+  }, []);
+
+  const navigate = (newPath: string) => {
+    window.history.pushState({}, "", newPath);
+    setPath(newPath);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   useEffect(() => {
     const showRandomNotification = () => {
@@ -69,6 +89,12 @@ export default function App() {
     e.stopPropagation();
     const search = window.location.search;
     
+    // Intercept checkout links to showcase the upsell/downsell/multumesc funnel simulation
+    if (url.includes("hotmart.com")) {
+      navigate("/upsell");
+      return;
+    }
+
     // If it's an internal hash link on the same page, we scroll.
     if (url.startsWith('#') && url !== '#') {
       const targetId = url.substring(1);
@@ -113,6 +139,43 @@ export default function App() {
       a: "Ai garanție 7 zile. Dacă nu ești mulțumită, îți returnăm banii, fără întrebări."
     }
   ];
+
+  if (path === "/upsell") {
+    return (
+      <UpsellPage 
+        onAccept={() => {
+          setPurchasedUpsell(true);
+          navigate("/thankyou");
+        }}
+        onDecline={() => {
+          navigate("/downsell");
+        }}
+      />
+    );
+  }
+
+  if (path === "/downsell") {
+    return (
+      <DownsellPage 
+        onAccept={() => {
+          setPurchasedDownsell(true);
+          navigate("/thankyou");
+        }}
+        onDecline={() => {
+          navigate("/thankyou");
+        }}
+      />
+    );
+  }
+
+  if (path === "/thankyou") {
+    return (
+      <ThankYouPage 
+        purchasedUpsell={purchasedUpsell}
+        purchasedDownsell={purchasedDownsell}
+      />
+    );
+  }
 
   return (
     <>
